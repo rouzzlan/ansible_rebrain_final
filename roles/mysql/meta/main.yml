@@ -1,0 +1,18 @@
+galaxy_info:
+  role_name: mysql
+  namespace: rebrain
+  author: Rebrain Student
+  description: Install and manage an mysql server.
+  company: Rebrain
+  license: MIT
+  min_ansible_version: "2.7"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - focal      # 20.04 LTS
+        - jammy      # 22.04 LTS
+        - noble      # 24.04 LTS
+
+  galaxy_tags:
+    - db
+dependencies: []

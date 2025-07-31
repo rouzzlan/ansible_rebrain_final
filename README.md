@@ -1,0 +1,31 @@
+# Installation instructions
+
+Install Joomla with
+
+### <font color="red">Disclamer</font>
+
+The passwords displayed here are just as an example, change the credentials to other values.
+
+```shell
+ansible-playbook install_joomla.yml -i inventory.yaml  -e "@ansible.vault" --ask-vault-pass
+```
+
+Vault password: `rebrain`
+
+## Post installation
+
+### Joomla setup
+
+Joomla admin user:
+login: `user`
+password: `@rebrain_ME{123}`
+
+### Site access
+
+By default, the domain name is set to `yourdomain.com`.</br>
+The site is accessible at `http://yourdomain.com`.</br>
+If working locally edit the `/etc/hosts` and add following line
+
+```text
+SERVER_IP yourdomain.com
+```

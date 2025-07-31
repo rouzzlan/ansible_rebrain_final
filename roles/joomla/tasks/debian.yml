@@ -1,0 +1,92 @@
+---
+- name: Pre setup
+  block:
+    - name: Ensure unzip is installed (Ubuntu)
+      ansible.builtin.apt:
+        name: unzip
+        state: present
+        update_cache: true
+      become: true
+
+    - name: Ensure that directory exists where Joomla will be installed
+      ansible.builtin.file:
+        path: "{{ joomla_installation_dir }}"
+        state: directory
+        mode: '0755'
+        recurse: true
+      become: true
+
+- name: Download joomla
+  block:
+
+    - name: "Replace . with - for URL"
+      ansible.builtin.set_fact:
+        joomla_url_v: "{{ joomla_version | replace('.', '-') }}"
+
+    - name: Generate download URL
+      ansible.builtin.set_fact:
+        joomla_download_url: "https://downloads.joomla.org/cms/joomla5/{{ joomla_url_v }}/Joomla_{{ joomla_url_v }}-Stable-Full_Package.zip?format=zip"
+
+    - name: "Debug "
+      ansible.builtin.debug:
+        msg: "Url is: {{ joomla_download_url }}"
+
+    - name: Download zip file
+      ansible.builtin.get_url:
+        url: "{{ joomla_download_url }}"
+        dest: /tmp/joomla.zip
+        mode: '0644'
+
+    - name: Unzip the file
+      ansible.builtin.unarchive:
+        src: /tmp/joomla.zip
+        dest: "{{ joomla_installation_dir }}"
+        remote_src: true
+      become: true
+
+- name: Configure right permissions
+  become: true
+  block:
+
+    #    - name: Find directories with incorrect permissions (not 0755)
+    #      ansible.builtin.find:
+    #        paths: "{{ installation_dir }}"
+    #        recurse: true
+    #        depth: 7
+    #        file_type: directory
+    #      register: found_dirs
+    #
+    #    - name: Set permissions to 0755 on directories
+    #      ansible.builtin.file:
+    #        path: "{{ item.path }}"
+    #        mode: '0755'
+    #        owner: www-data
+    #        group: www-data
+    #      loop: "{{ found_dirs.files }}"
+    #      when: item.mode != '0755'
+    #
+    #    - name: Find files with incorrect permissions (not 0644)
+    #      ansible.builtin.find:
+    #        paths: "{{ installation_dir }}"
+    #        recurse: true
+    #        depth: 7
+    #        file_type: file
+    #        patterns: '*'
+    #      register: found_files
+    #
+    #    - name: Fix permissions to 0644
+    #      ansible.builtin.file:
+    #        path: "{{ item.path }}"
+    #        mode: '0644'
+    #        owner: www-data
+    #        group: www-data
+    #      loop: "{{ found_files.files }}"
+    #      when: item.mode != '0644'
+
+    - name: Set ownership and permissions on Joomla directory
+      ansible.builtin.file:
+        path: "{{ joomla_installation_dir }}"
+        mode: '0755'
+        owner: www-data
+        group: www-data
+        recurse: true

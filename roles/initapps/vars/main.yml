@@ -1,0 +1,10 @@
+---
+initapps_supported_os_family:
+  debian: debian.yml
+# vars file for initapps
+initapps_joomla_config_file_tmpl: joomla.conf.j2
+initapps_joomla_config_file: joomla.conf
+
+# misc
+initapps_nginx_check:
+initapps_mysql_check:

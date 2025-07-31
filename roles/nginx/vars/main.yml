@@ -1,0 +1,4 @@
+---
+# task files dict for supported OS
+nginx_supported_os_family:
+  debian: debian.yml

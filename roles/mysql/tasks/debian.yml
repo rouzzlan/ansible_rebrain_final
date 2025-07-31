@@ -1,0 +1,72 @@
+---
+
+- name: MySQL-server installation
+  block:
+
+    - name: Install MySQL on Debian/Ubuntu latest version
+      become: true
+      ansible.builtin.apt:
+        name: "{{ item }}"
+        state: latest
+        update_cache: true
+      loop:
+        - mysql-server
+        - python3-pymysql
+
+    - name: Get value of 'user' from config file
+      ansible.builtin.shell: |
+        set -o pipefail
+        grep '^user' /etc/mysql/debian.cnf | head -1 | awk -F '=' '{print $2}' | xargs
+      register: mysql_user_result
+      changed_when: false
+      args:
+        executable: /bin/bash
+      become: true
+
+    - name: Set user variable from result
+      ansible.builtin.set_fact:
+        mysql_default_user_user: "{{ mysql_user_result.stdout }}"
+
+    - name: Get value of 'password' from config file
+      ansible.builtin.shell: |
+        set -o pipefail
+        grep '^password' /etc/mysql/debian.cnf | head -1 | awk -F '=' '{print $2}' | xargs
+      register: mysql_passwd_result
+      changed_when: false
+      args:
+        executable: /bin/bash
+      become: true
+
+    - name: Set passwd variable from result
+      ansible.builtin.set_fact:
+        mysql_default_user_password: "{{ mysql_passwd_result.stdout }}"
+
+    - name: Create or update MySQL root user
+      community.mysql.mysql_user:
+        name: root
+        host: localhost
+        password: "{{ mysql_root_password }}"
+        login_user: "{{ mysql_default_user_user }}"
+        login_password: "{{ mysql_default_user_password }}"
+        priv: '*.*:ALL,GRANT'
+        state: present
+
+    - name: Secure MySQL
+      become: true
+      ansible.builtin.expect:
+        command: mysql_secure_installation
+        responses:
+          '.*Enter password for user root.*': "{{ mysql_root_password }}"
+          '.*VALIDATE PASSWORD.*': 'n'
+          '.*Change the password for root.*': 'n'
+          '.*Remove anonymous users.*': 'y'
+          '.*Disallow root login remotely.*': 'y'
+          '.*Remove test database and access to it.*': 'y'
+          '.*Reload privilege tables now.*': 'y'
+        timeout: 1
+
+- name: Generic actions
+  block:
+
+    - name: Include common tasks
+      ansible.builtin.include_tasks: generic.yml

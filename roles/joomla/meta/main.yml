@@ -1,0 +1,18 @@
+galaxy_info:
+  role_name: joomla
+  namespace: rebrain
+  author: Rebrain Student
+  description: Downloads and extracts Joomla files
+  company: Rebrain
+  license: MIT
+  min_ansible_version: "2.7"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - focal      # 20.04 LTS
+        - jammy      # 22.04 LTS
+        - noble      # 24.04 LTS
+
+  galaxy_tags:
+    - web
+dependencies: []

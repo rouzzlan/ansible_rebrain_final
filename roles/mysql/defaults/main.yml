@@ -1,0 +1,4 @@
+---
+# DB Credentials
+# root user
+mysql_root_password: ""

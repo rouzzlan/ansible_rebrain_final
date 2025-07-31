@@ -1,0 +1,9 @@
+---
+mysql_supported_os_family:
+  debian: debian.yml
+
+mysql_default_user_user:
+mysql_default_user_passwd:
+
+mysql_user_result:
+mysql_passwd_result:

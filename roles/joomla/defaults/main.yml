@@ -1,0 +1,8 @@
+---
+# defaults file for joomla
+joomla_version: 5.1.4
+# Debian default
+joomla_installation_dir: /var/www/sites/joomla
+
+
+# https://downloads.joomla.org/cms/joomla5/5-1-4/Joomla_5-1-4-Stable-Full_Package.zip?format=zip

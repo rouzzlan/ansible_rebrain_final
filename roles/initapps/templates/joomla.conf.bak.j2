@@ -1,0 +1,39 @@
+server {
+    listen 80;
+    server_name yourdomain.com www.yourdomain.com;
+
+    root /var/www/sites/joomla;   # Replace with the actual path to your Joomla site
+    index index.php index.html;
+
+    # Logging
+    access_log /var/log/nginx/joomla_access.log;
+    error_log  /var/log/nginx/joomla_error.log;
+
+    # Security headers (optional but recommended)
+    add_header X-Frame-Options "SAMEORIGIN";
+    add_header X-Content-Type-Options nosniff;
+
+    location / {
+        try_files $uri $uri/ /index.php?$args;
+    }
+
+    # PHP files
+    location ~ \.php$ {
+        include fastcgi_params;
+        fastcgi_pass unix:/run/php-fpm/www.sock;   # adjust if using TCP or different socket
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    }
+
+    # Deny access to sensitive files
+    location ~* \.(ini|log|sh|sql|tpl|md|git|htaccess)$ {
+        deny all;
+    }
+
+    # Cache control for static files
+    location ~* \.(jpg|jpeg|png|gif|ico|css|js|pdf|ttf|woff|woff2|svg)$ {
+        expires 30d;
+        access_log off;
+        add_header Cache-Control "public";
+    }
+}

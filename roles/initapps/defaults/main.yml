@@ -1,0 +1,11 @@
+---
+# defaults file for initapps
+initapps_nginx:
+  sites_available_path: /etc/nginx/sites-available
+  sites_enabled_path: /etc/nginx/sites-enabled
+  domain_name: yourdomain.com
+initapps_mysql:
+  root_password:
+  admin_user:
+  admin_password:
+initapps_mysql_joomla_db: joomla_db

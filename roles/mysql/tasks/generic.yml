@@ -1,0 +1,16 @@
+---
+- name: Ensure MySQL is running and enabled
+  become: true
+  ansible.builtin.service:
+    name: mysql
+    state: started
+    enabled: true
+
+- name: Run MySQL version command # noqa: command-instead-of-shell
+  ansible.builtin.shell: mysql --version
+  register: mysql_version
+  changed_when: false
+
+- name: Show MySQL version
+  ansible.builtin.debug:
+    msg: "MySQL version: {{ mysql_version.stdout }}"

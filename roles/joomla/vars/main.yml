@@ -1,0 +1,6 @@
+---
+joomla_supported_os_family:
+  debian: debian.yml
+# vars file for joomla
+joomla_download_url:
+joomla_url_v:

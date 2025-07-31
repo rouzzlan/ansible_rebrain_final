@@ -1,0 +1,131 @@
+---
+- name: Prechecks
+  become: true
+  block:
+    - name: Check if MySQL is installed
+      ansible.builtin.shell: |
+        mysql --version
+      register: initapps_mysql_check
+      changed_when: false
+      failed_when: initapps_mysql_check.rc != 0
+
+    - name: Debug MySQL version
+      ansible.builtin.debug:
+        msg: "MySQL is installed: {{ initapps_mysql_check.stdout }}"
+
+    - name: Check if NGINX is installed
+      ansible.builtin.shell: |
+        nginx -v
+      register: initapps_nginx_check
+      changed_when: false
+      failed_when: initapps_nginx_check.rc != 0
+
+    - name: Debug NGINX version
+      ansible.builtin.debug:
+        msg: "NGINX is installed: {{ initapps_nginx_check.stdout }}"
+
+# tasks file for initapps
+- name: NGINX config
+  become: true
+  block:
+    - name: Ensure full folder path exists
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+        recurse: true
+      loop:
+        - "{{ initapps_nginx.sites_enabled_path }}"
+        - "{{ initapps_nginx.sites_available_path }}"
+
+    - name: Generate config from template
+      ansible.builtin.template:
+        src: "{{ initapps_joomla_config_file_tmpl }}"
+        dest: "{{ initapps_nginx.sites_available_path }}/{{ initapps_joomla_config_file }}"
+        mode: '0644'
+
+    - name: Create symbolic link from file
+      ansible.builtin.file:
+        src: "{{ initapps_nginx.sites_available_path }}/{{ initapps_joomla_config_file }}"
+        dest: "{{ initapps_nginx.sites_enabled_path }}/{{ initapps_joomla_config_file }}"
+        state: link
+      notify: Reload nginx
+
+- name: Ensure apps are running and enabled
+  become: true
+  block:
+    - name: Ensure MySQL is running and enabled
+      ansible.builtin.service:
+        name: mysql
+        state: started
+        enabled: true
+
+    - name: Ensure php8.3-fpm is running and enabled
+      ansible.builtin.service:
+        name: php8.1-fpm
+        state: started
+        enabled: true
+
+    - name: Ensure NGINX is running and enabled
+      ansible.builtin.service:
+        name: nginx
+        state: started
+        enabled: true
+
+- name: Additional PHP configuration
+  become: true
+  block:
+    - name: Copy php.ini to remote server
+      ansible.builtin.copy:
+        src: php.ini
+        dest: /etc/php/8.1/fpm/php.ini
+        mode: '0644'
+      notify: Restart php8.1-fpm
+
+- name: Creating admin and db for Joomla
+  become: true
+  block:
+    - name: Create user for Joomla DB
+      community.mysql.mysql_user:
+        login_user: root
+        login_password: "{{ initapps_mysql.root_password }}"
+        name: "{{ initapps_mysql.admin_user }}"
+        password: "{{ initapps_mysql.admin_password }}"
+        host: localhost
+        priv: "*.*:ALL,GRANT"
+        column_case_sensitive: false
+        state: present
+
+    - name: Get list of MySQL users
+      community.mysql.mysql_info:
+        login_user: "{{ initapps_mysql.admin_user }}"
+        login_password: "{{ initapps_mysql.admin_password }}"
+        filter: users
+      register: mysql_user_info
+
+    - name: Print MySQL users
+      ansible.builtin.debug:
+        var: mysql_user_info.users
+
+    - name: Create MySQL database
+      community.mysql.mysql_db:
+        name: "{{ initapps_mysql_joomla_db }}"
+        state: present
+        login_user: "{{ initapps_mysql.admin_user }}"
+        login_password: "{{ initapps_mysql.admin_password }}"
+
+    # Check if DB is created with: mysql -u admin -pYOUR_PASSWORD -h localhost
+    # then list DB with: SHOW DATABASES;
+    - name: Get list of MySQL databases
+      community.mysql.mysql_info:
+        filter: databases
+        login_user: "{{ initapps_mysql.admin_user }}"
+        login_password: "{{ initapps_mysql.admin_password }}"
+        login_host: localhost
+      register: db_info
+
+      # login in specific database: mysql -u admin -pYOUR_PASSWORD} -h localhost joomla
+      # list tables in joomla database: SHOW TABLES FROM joomla;
+    - name: Print list of MySQL databases
+      ansible.builtin.debug:
+        var: db_info.databases

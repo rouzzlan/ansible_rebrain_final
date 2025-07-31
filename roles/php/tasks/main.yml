@@ -1,0 +1,13 @@
+---
+# tasks file for nginx
+- name: Сollecting only the necessary facts
+  ansible.builtin.setup:
+    filter:
+      - os_family
+
+- name: Set default value if item is not present in the list
+  ansible.builtin.set_fact:
+    php_task_file: "{{ php_supported_os_family[ansible_facts['os_family'] | lower] | default('stub.yml') }}"
+
+- name: Include tasks for the proper OS
+  ansible.builtin.include_tasks: "{{ php_task_file }}"

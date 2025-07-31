@@ -1,0 +1,48 @@
+# === WebStorm ===
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# === Python (common with Ansible) ===
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+.eggs/
+*.env
+*.venv
+.env/
+.venv/
+
+# === Ansible ===
+*.retry
+*.log
+inventory.ini
+host_vars/*.vault
+group_vars/*.vault
+secrets.yml
+vault_pass.txt
+
+# Optional: Exclude Ansible-generated outputs
+ansible_facts_cache/
+*.facts
+*.json
+
+# === OS / Editor ===
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# === Backup files ===
+*~
+*.bak
+*.old
+
+# === Misc ===
+.vscode/
+logs/
+tmp/
+.cache/

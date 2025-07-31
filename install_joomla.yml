@@ -1,0 +1,10 @@
+---
+- name: Joomla installation
+  hosts: webservers
+  gather_facts: true
+  roles:
+    - role: nginx
+    - role: mysql
+    - role: joomla
+    - role: php
+    - role: initapps

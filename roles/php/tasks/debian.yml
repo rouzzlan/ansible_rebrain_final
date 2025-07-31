@@ -1,0 +1,24 @@
+---
+# tasks file for php
+- name: PHP Installation on Ubuntu
+  become: true
+  block:
+    - name: Ensure required packages are present
+      ansible.builtin.apt:
+        name:
+          - software-properties-common
+          - ca-certificates
+        state: present
+        update_cache: true
+
+    - name: Add PHP 8.1 PPA
+      ansible.builtin.apt_repository:
+        repo: ppa:ondrej/php
+        state: present
+        update_cache: true
+
+    - name: Install PHP 8.1 and common extensions
+      ansible.builtin.apt:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ php_ubuntu_packages }}"

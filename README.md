@@ -1,6 +1,6 @@
 # Installation instructions
 
-Install Joomla with
+Install Joomla with Ansible
 
 ### <font color="red">Disclamer</font>
 
@@ -22,11 +22,7 @@ Vault password: `rebrain`
 
 ## Post installation
 
-### Joomla setup
-
-Joomla admin user:
-login: `user`
-password: `@rebrain_ME{123}`
+After running the playbook, you can follow the following steps to access your newly deployed website.
 
 ### Site access
 

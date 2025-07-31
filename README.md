@@ -6,6 +6,8 @@ Install Joomla with
 
 The passwords displayed here are just as an example, change the credentials to other values.
 
+## Run Playbook
+
 ```shell
 ansible-playbook install_joomla.yml -i inventory.yaml  -e "@ansible.vault" --ask-vault-pass
 ```

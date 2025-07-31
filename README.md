@@ -10,6 +10,12 @@ The passwords displayed here are just as an example, change the credentials to o
 ansible-playbook install_joomla.yml -i inventory.yaml  -e "@ansible.vault" --ask-vault-pass
 ```
 
+or if `DEV_PASSWD` is not set
+
+```shell
+DEV_PASSWD=yourPasswd ansible-playbook install_joomla.yml -i inventory.yaml  -e "@ansible.vault" --ask-vault-pass
+```
+
 Vault password: `rebrain`
 
 ## Post installation
